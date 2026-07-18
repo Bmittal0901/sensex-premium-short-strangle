@@ -362,16 +362,16 @@
   async function startAlgo() {
     const errEl = document.getElementById("formError");
     errEl.textContent = "";
+    const targetInput = document.getElementById("targetProfit").value.trim();
     const body = {
       expiry: document.getElementById("expiry").value,
       lots: parseInt(document.getElementById("lots").value, 10),
-      target_profit: parseFloat(document.getElementById("targetProfit").value),
+      target_profit: targetInput === ""? null : parseFloat(targetInput),
       dry_run: document.getElementById("dryRun").checked,
-
     };
+    
     if (!body.expiry) { errEl.textContent = "Expiry is required."; return; }
     if (!body.lots || body.lots <= 0) { errEl.textContent = "Lots must be a positive number."; return; }
-    if (!body.target_profit || body.target_profit <= 0) { errEl.textContent = "Target profit must be positive."; return; }
 
     document.getElementById("startBtn").disabled = true;
     try {

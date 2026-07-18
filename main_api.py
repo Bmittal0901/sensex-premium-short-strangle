@@ -276,7 +276,7 @@ class StartRequest(BaseModel):
     band, SL%, and square-off time are all fixed inside PremiumSellBot."""
     expiry: str
     lots: int = Field(gt=0)
-    target_profit: float = Field(gt=0)
+    target_profit: Optional[float] = None
     dry_run: bool = True
 
 
