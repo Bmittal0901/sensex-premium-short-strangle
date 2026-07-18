@@ -538,21 +538,21 @@
     }
     const toggle = document.getElementById("dryRun");
     const modeLabel = document.getElementById("modeLabel");
+    if (running){
+      toggle.checked = data.dry_run;
 
-    toggle.checked = data.dry_run;
-
-    if (data.dry_run) {
-        modeLabel.textContent = "DRY RUN";
-        modeLabel.style.color = "#b983ff";
-    } else {
-        modeLabel.textContent = "LIVE";
-        modeLabel.style.color = "#ff5555";
+      if (data.dry_run) {
+          modeLabel.textContent = "DRY RUN";
+          modeLabel.style.color = "#b983ff";
+      } else {
+          modeLabel.textContent = "LIVE";
+          modeLabel.style.color = "#ff5555";
+      }
     }
     document.getElementById("startBtn").disabled = running;
     document.getElementById("stopBtn").disabled = !running;
     document.getElementById("exitBtn").disabled = !running;
-    document.getElementById("dryRun").disabled = running;
-
+    toggle.disabled = running;
     const pnl = data.total_pnl || 0;
     const pnlEl = document.getElementById("pnlVal");
     pnlEl.textContent = "₹" + pnl.toLocaleString("en-IN", {minimumFractionDigits: 2});
