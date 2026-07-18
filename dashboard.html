@@ -416,29 +416,41 @@
     } catch (e) { /* ignore transient errors */ }
   }
 
-  function handleModeToggle(toggle){
+  function handleModeToggle(toggle) {
 
-    if(toggle.checked){
-        return;
-    }
+      const label = document.getElementById("modeLabel");
 
-    const ok = confirm(
-    `⚠️ LIVE MODE
+      if (toggle.checked) {
 
-    Real orders will be placed in your Zerodha account.
+          // Switched to DRY RUN
+          label.textContent = "DRY RUN";
+          label.style.color = "#b983ff";
+          return;
+      }
 
-    • Orders cannot be automatically reversed.
-    • Real money is at risk.
+      const ok = confirm(
+  `⚠️ LIVE MODE
 
-    Do you want to continue?`
-        );
+  Real orders will be placed in your Zerodha account.
 
-        if(!ok){
+  • Orders cannot be automatically reversed.
+  • Real money is at risk.
 
-            toggle.checked = true;
-            return;
-        }
-    }
+  Do you want to continue?`
+      );
+
+      if (!ok) {
+
+          toggle.checked = true;
+          label.textContent = "DRY RUN";
+          label.style.color = "#b983ff";
+          return;
+      }
+
+      // Switched to LIVE
+      label.textContent = "LIVE";
+      label.style.color = "#ff5555";
+  }
 
     // async function logout() {
 
