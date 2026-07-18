@@ -32,7 +32,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from kiteconnect import KiteConnect
 from pydantic import BaseModel, Field
 
-from premium_bot_engine import TradingBot, env_dry_run
+
 from premium_bot_engine import PremiumSellBot
 from zerodha_config import API_KEY, API_SECRET
 
@@ -241,7 +241,7 @@ def start(req: StartRequest):
         "target_profit": req.target_profit,
     }
 
-    _bot = TradingBot(kite, config)
+    _bot = PremiumSellBot(kite, config)
     _bot.start()
     return {"message": "Bot started.", "dry_run": config["dry_run"]}
 
