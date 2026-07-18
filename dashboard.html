@@ -208,12 +208,12 @@
     </div>
     <div style="display:flex;align-items:center;gap:14px;">
       <span class="user-name-tb" id="userNameTb"></span>
-      <button
+      <!-- <button
             id="logoutBtn"
             class="btn btn-outline"
             onclick="logout()">
             LOGOUT
-      </button>
+      </button> -->
       <span class="clock" id="clock">--:--:--</span>
       <a href="/" style="font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted);">MULTI-LEG ALGO</a>
     </div>
@@ -448,35 +448,35 @@
         label.style.color="#ff5555";
     }
 
-    async function logout() {
+    // async function logout() {
 
-        const ok = confirm(
-            "Logout from Zerodha and return to the login screen?"
-        );
+    //     const ok = confirm(
+    //         "Logout from Zerodha and return to the login screen?"
+    //     );
 
-        if (!ok) return;
+    //     if (!ok) return;
 
-        stopPolling();
+    //     stopPolling();
 
-        try {
+    //     try {
 
-            await fetch("/api/logout", {
-                method: "POST"
-            });
+    //         await fetch("/api/logout", {
+    //             method: "POST"
+    //         });
 
-        } catch (e) {}
+    //     } catch (e) {}
 
-        // Clear setup form
-        document.getElementById("expiry").value = "";
-        document.getElementById("lots").value = 1;
-        document.getElementById("targetProfit").value = "";
-        document.getElementById("dryRun").checked = true;
+    //     // Clear setup form
+    //     document.getElementById("expiry").value = "";
+    //     document.getElementById("lots").value = 1;
+    //     document.getElementById("targetProfit").value = "";
+    //     document.getElementById("dryRun").checked = true;
 
-        // Reset UI
-        resetDashboard();
+    //     // Reset UI
+    //     resetDashboard();
 
-        showScreen("screenLogin");
-    }
+    //     showScreen("screenLogin");
+    // }
 
     function resetDashboard() {
 
@@ -517,7 +517,21 @@
     lbl.classList.toggle("on", running);
     lbl.textContent = (data.status || "idle").toUpperCase();
 
-    document.getElementById("dryBadge").classList.toggle("on", !!data.dry_run);
+    const badge = document.getElementById("dryBadge");
+
+    badge.classList.add("on");
+
+    if (data.dry_run) {
+        badge.textContent = "DRY RUN";
+        badge.style.background = "rgba(255,193,7,.12)";
+        badge.style.color = "#ffc107";
+        badge.style.border = "1px solid rgba(255,193,7,.25)";
+    } else {
+        badge.textContent = "LIVE";
+        badge.style.background = "rgba(255,61,87,.12)";
+        badge.style.color = "#ff3d57";
+        badge.style.border = "1px solid rgba(255,61,87,.25)";
+    }
 
     document.getElementById("startBtn").disabled = running;
     document.getElementById("stopBtn").disabled = !running;
