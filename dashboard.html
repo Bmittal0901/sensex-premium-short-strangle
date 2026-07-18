@@ -522,20 +522,23 @@
     lbl.textContent = (data.status || "idle").toUpperCase();
 
     const badge = document.getElementById("dryBadge");
+    if(running){
+      badge.classList.add("on");
 
-    badge.classList.add("on");
-
-    if (data.dry_run) {
-        badge.textContent = "DRY RUN";
-        badge.style.background = "rgba(255,193,7,.12)";
-        badge.style.color = "#ffc107";
-        badge.style.border = "1px solid rgba(255,193,7,.25)";
+      if (data.dry_run) {
+          badge.textContent = "DRY RUN";
+          badge.style.background = "rgba(255,193,7,.12)";
+          badge.style.color = "#ffc107";
+          badge.style.border = "1px solid rgba(255,193,7,.25)";
+      } else {
+          badge.textContent = "LIVE";
+          badge.style.background = "rgba(255,61,87,.12)";
+          badge.style.color = "#ff3d57";
+          badge.style.border = "1px solid rgba(255,61,87,.25)";
+      }
     } else {
-        badge.textContent = "LIVE";
-        badge.style.background = "rgba(255,61,87,.12)";
-        badge.style.color = "#ff3d57";
-        badge.style.border = "1px solid rgba(255,61,87,.25)";
-    }
+    badge.classList.remove("on");
+  }
     const toggle = document.getElementById("dryRun");
     const modeLabel = document.getElementById("modeLabel");
     if (running){
