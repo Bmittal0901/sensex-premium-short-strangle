@@ -418,12 +418,7 @@
 
   function handleModeToggle(toggle){
 
-    const label = document.getElementById("modeLabel");
-
     if(toggle.checked){
-
-        label.innerHTML = "DRY RUN";
-        label.style.color="#b983ff";
         return;
     }
 
@@ -443,9 +438,6 @@
             toggle.checked = true;
             return;
         }
-
-        label.innerHTML="LIVE";
-        label.style.color="#ff5555";
     }
 
     // async function logout() {
@@ -532,10 +524,22 @@
         badge.style.color = "#ff3d57";
         badge.style.border = "1px solid rgba(255,61,87,.25)";
     }
+    const toggle = document.getElementById("dryRun");
+    const modeLabel = document.getElementById("modeLabel");
 
+    toggle.checked = data.dry_run;
+
+    if (data.dry_run) {
+        modeLabel.textContent = "DRY RUN";
+        modeLabel.style.color = "#b983ff";
+    } else {
+        modeLabel.textContent = "LIVE";
+        modeLabel.style.color = "#ff5555";
+    }
     document.getElementById("startBtn").disabled = running;
     document.getElementById("stopBtn").disabled = !running;
     document.getElementById("exitBtn").disabled = !running;
+    document.getElementById("dryRun").disabled = running;
 
     const pnl = data.total_pnl || 0;
     const pnlEl = document.getElementById("pnlVal");
