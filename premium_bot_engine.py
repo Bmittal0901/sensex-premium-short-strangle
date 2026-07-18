@@ -27,13 +27,21 @@ from premium_strategy import (
     sell_leg_pnl,
     combined_pnl,
 )
-from utils import list_option_candidates, INDEX_EXCHANGE
-from premium_bot_engine import env_dry_run
 
+from config import (
+    INDEX,
+    LOT_SIZE,
+    ENTRY_TIME,
+    FALLBACK_PREMIUM_TOLERANCE,
+    EXIT_TIME,)
+from utils import list_option_candidates, INDEX_EXCHANGE
+from config import env_dry_run
+from config import (LTP_REFRESH_INTERVAL,
+    ORDER_RETRY_COUNT,
+    ORDER_STATUS_TIMEOUT,
+)
+POLL_INTERVAL = LTP_REFRESH_INTERVAL
 IST = pytz.timezone("Asia/Kolkata")
-ORDER_RETRY_COUNT = 3
-ORDER_STATUS_TIMEOUT = 5
-POLL_INTERVAL = 5
 
 INDEX_QUOTE_SYMBOL = {
     "SENSEX": "BSE:SENSEX",
@@ -50,12 +58,12 @@ class PremiumSellBot:
     Everything else (index, premium band, SL %, square-off time) is fixed
     by design, not user-configurable.
     """
-    INDEX = "SENSEX"
-    LOT_SIZE = 20
+    # INDEX = "SENSEX"
+    # LOT_SIZE = 20
     SL_PREMIUM_TARGET = PREMIUM_TARGET
     SL_PREMIUM_TOLERANCE = PREMIUM_TOLERANCE
-    SL_PREMIUM_FALLBACK_TOLERANCE = PREMIUM_TOLERANCE * 2  # 60 +/- 5, fallback 60 +/- 10
-    SQUARE_OFF_TIME = "15:20"
+    SL_PREMIUM_FALLBACK_TOLERANCE = FALLBACK_PREMIUM_TOLERANCE# 60 +/- 5, fallback 60 +/- 10
+    # SQUARE_OFF_TIME = "15:20"
 
     def __init__(self, kite, config: dict):
         self.kite = kite
@@ -65,16 +73,16 @@ class PremiumSellBot:
         if self.dry_run is None:
             self.dry_run = env_dry_run()
 
-        self.index = self.INDEX
+        self.index = INDEX
         self.expiry = config["expiry"]
         self.lots = config["lots"]
-        self.lot_size = self.LOT_SIZE
+        self.lot_size = LOT_SIZE
         self.qty = self.lots * self.lot_size
         self.target_profit = config["target_profit"]
         self.premium_target = self.SL_PREMIUM_TARGET
         self.premium_tolerance = self.SL_PREMIUM_TOLERANCE
         self.premium_fallback_tolerance = self.SL_PREMIUM_FALLBACK_TOLERANCE
-        self.square_off_time = self.SQUARE_OFF_TIME
+        self.square_off_time = EXIT_TIME
         self.exchange = INDEX_EXCHANGE[self.index]
 
         self._lock = threading.Lock()
@@ -166,12 +174,27 @@ class PremiumSellBot:
 
     def _is_market_open(self):
         now = datetime.now(IST)
+
         if now.weekday() >= 5:
             return False
-        market_open = now.replace(hour=9, minute=50, second=0, microsecond=0)
-        market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
-        return market_open <= now <= market_close
 
+        hh, mm = ENTRY_TIME.split(":")
+
+        market_open = now.replace(
+            hour=int(hh),
+            minute=int(mm),
+            second=0,
+            microsecond=0,
+        )
+
+        market_close = now.replace(
+            hour=15,
+            minute=30,
+            second=0,
+            microsecond=0,
+        )
+
+        return market_open <= now <= market_close
     def _past_square_off(self):
         now = datetime.now(IST)
         hh, mm = self.square_off_time.split(":")

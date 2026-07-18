@@ -72,3 +72,17 @@ REFRESH_INTERVAL = 1
 # ==========================================================
 
 DEFAULT_DRY_RUN = True
+
+import os
+
+def env_dry_run():
+    return os.getenv("DRY_RUN", "true").lower() == "true"
+
+TARGET_PREMIUM = 60
+
+PREMIUM_MIN = 55
+PREMIUM_MAX = 65
+
+FALLBACK_PREMIUM_MIN = 50
+FALLBACK_PREMIUM_MAX = 70
+FALLBACK_PREMIUM_TOLERANCE = 10

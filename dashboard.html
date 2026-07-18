@@ -137,7 +137,7 @@
     <div class="error-msg" id="loginError"></div>
     <button class="login-btn" onclick="loginWithZerodha()">LOGIN WITH ZERODHA</button>
     <div class="login-note">Your credentials are entered directly on Zerodha's secure website.<br>We never see your password.</div>
-    <a class="back-link" href="/">&larr; Multi-leg algo dashboard</a>
+    <a class="back-link" href="/">&larr; Multi-leg algo</a>
   </div>
 </div>
 
@@ -257,7 +257,7 @@
     const errEl = document.getElementById("loginError");
     errEl.textContent = "";
     try {
-      const res = await fetch("/api/zerodha-login-url?next=/premium");
+      const res = await fetch("/api/zerodha-login-url?next=/");
       const data = await res.json();
       window.location.href = data.url;
     } catch (e) {
@@ -295,7 +295,7 @@
 
     document.getElementById("startBtn").disabled = true;
     try {
-      const res = await fetch("/api/premium/start", {
+      const res = await fetch("/api/start", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(body),
@@ -312,25 +312,25 @@
 
   async function stopAlgo() {
     document.getElementById("stopBtn").disabled = true;
-    try { await fetch("/api/premium/stop", {method:"POST"}); pushLog("Stop requested.", "def"); }
+    try { await fetch("/api/stop", {method:"POST"}); pushLog("Stop requested.", "def"); }
     catch (e) { pushLog("Failed to request stop.", "error"); }
   }
 
   async function exitAlgo() {
     document.getElementById("exitBtn").disabled = true;
-    try { await fetch("/api/premium/exit", {method:"POST"}); pushLog("Exit requested.", "def"); }
+    try { await fetch("/api/exit", {method:"POST"}); pushLog("Exit requested.", "def"); }
     catch (e) { pushLog("Failed to request exit.", "error"); }
   }
 
   function startPolling() {
     if (pollTimer) clearInterval(pollTimer);
     pollStatus();
-    pollTimer = setInterval(pollStatus, 3000);
+    pollTimer = setInterval(pollStatus, 5000);
   }
 
   async function pollStatus() {
     try {
-      const res = await fetch("/api/premium/status");
+      const res = await fetch("/api/status");
       const data = await res.json();
       render(data);
     } catch (e) { /* ignore transient errors */ }
