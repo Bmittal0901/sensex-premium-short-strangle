@@ -34,6 +34,7 @@ from pydantic import BaseModel, Field
 
 
 from premium_bot_engine import PremiumSellBot
+from premium_bot_engine import env_dry_run
 from zerodha_config import API_KEY, API_SECRET
 
 app = FastAPI(title="SensexAlgo API")
@@ -53,7 +54,7 @@ _PREMIUM_DASHBOARD_PATH = os.path.join(os.path.dirname(__file__), "premium_dashb
 _access_token: Optional[str] = None
 _user_name: Optional[str] = None
 
-_bot: Optional[TradingBot] = None
+_bot: Optional[PremiumSellBot] = None
 _RUNNING_STATES = {"resolving", "waiting_for_market", "entering", "monitoring"}
 
 _premium_bot: Optional[PremiumSellBot] = None
