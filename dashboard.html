@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SENSEX Premium Band Algo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:#0a0714; --surface:#120c20; --surface2:#181128; --border:#2a1f45; --border2:#3a2c60;
+    --text:#ece6f8; --muted:#7a6a9c; --accent:#c084fc; --green:#00e676; --red:#ff3d57; --yellow:#ffc107;
+    --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(192,132,252,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(192,132,252,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+
+  .screen { display:none; position:relative; z-index:1; min-height:100vh; align-items:center; justify-content:center; padding:40px 20px; }
+  .screen.active { display:flex; }
+
+  .card { width:100%; max-width:480px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:44px; position:relative; overflow:hidden; }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); }
+
+  .brand { text-align:center; margin-bottom:32px; }
+  .brand-tag { font-family:var(--mono); font-size:11px; letter-spacing:4px; color:var(--accent); text-transform:uppercase; margin-bottom:10px; }
+  .brand-title { font-size:24px; font-weight:600; letter-spacing:-0.5px; }
+  .brand-sub { font-size:13px; color:var(--muted); margin-top:6px; }
+
+  .login-steps { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px; }
+  .login-step { display:flex; align-items:flex-start; gap:14px; padding:8px 0; }
+  .login-step:not(:last-child) { border-bottom:1px solid var(--border); }
+  .step-num { width:24px; height:24px; border-radius:50%; background:rgba(192,132,252,0.12); border:1px solid rgba(192,132,252,0.35); color:var(--accent); font-family:var(--mono); font-size:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .step-text { font-size:13px; color:var(--muted); line-height:1.6; }
+  .step-text strong { color:var(--text); font-weight:500; }
+
+  .login-btn { width:100%; padding:16px; background:var(--accent); border:none; border-radius:12px; color:#12081f; font-size:13px; font-weight:700; font-family:var(--mono); letter-spacing:2px; cursor:pointer; text-transform:uppercase; margin-top:8px; }
+  .login-btn:hover { opacity:0.88; }
+  .login-btn:active { transform:scale(0.98); }
+  .login-note { text-align:center; font-size:12px; color:var(--muted); margin-top:16px; line-height:1.7; }
+  .error-msg { font-size:12px; color:var(--red); min-height:18px; margin-bottom:10px; font-family:var(--mono); }
+  .back-link { display:block; text-align:center; margin-top:18px; font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--muted); }
+  .back-link:hover { color:var(--accent); }
+
+  /* -------- dashboard screen -------- */
+  #screenDash { flex-direction:column; align-items:stretch; padding:0; }
+  .topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-brand { font-family:var(--mono); font-size:12px; letter-spacing:3px; color:var(--accent); }
+  .divider-v { width:1px; height:20px; background:var(--border); }
+  .topbar-title { font-size:13px; color:var(--muted); }
+  .clock { font-family:var(--mono); font-size:13px; color:var(--muted); }
+  .user-name-tb { font-size:12px; color:var(--green); font-family:var(--mono); }
+
+  .wrap { max-width:1000px; margin:0 auto; padding:24px; width:100%; }
+  .dcard { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:16px; }
+  .section-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+
+  .form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+  .form-group { display:flex; flex-direction:column; gap:7px; }
+  .form-group label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; font-weight:500; }
+  .form-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:11px 14px; font-size:14px; font-family:var(--sans); outline:none; width:100%; }
+  .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(192,132,252,0.12); }
+
+  .btn-row { display:flex; gap:12px; margin-top:6px; }
+  .btn { padding:14px 20px; border-radius:10px; font-family:var(--mono); font-size:12px; letter-spacing:1.5px; cursor:pointer; text-transform:uppercase; border:none; }
+  .btn:active { transform:scale(0.98); }
+  .btn:disabled { opacity:0.35; cursor:not-allowed; }
+  .btn-start { background:var(--accent); color:#12081f; font-weight:700; flex:1; }
+  .btn-stop { background:transparent; border:1px solid var(--red); color:var(--red); }
+  .btn-exit { background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
+
+  .status-bar { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+  .status-pill { display:flex; align-items:center; gap:10px; }
+  .pulse-dot { width:10px; height:10px; border-radius:50%; background:var(--red); }
+  .pulse-dot.on { background:var(--green); animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,230,118,.4)} 70%{box-shadow:0 0 0 8px rgba(0,230,118,0)} 100%{box-shadow:0 0 0 0 rgba(0,230,118,0)} }
+  .status-lbl { font-family:var(--mono); font-size:12px; letter-spacing:1px; color:var(--red); font-weight:700; }
+  .status-lbl.on { color:var(--green); }
+  .dry-badge { font-family:var(--mono); font-size:10px; letter-spacing:1px; padding:4px 10px; border-radius:4px; background:rgba(255,193,7,.12); color:var(--yellow); border:1px solid rgba(255,193,7,.25); display:none; }
+  .dry-badge.on { display:block; }
+  .band-chip { font-family:var(--mono); font-size:10px; letter-spacing:1px; padding:4px 10px; border-radius:4px; background:rgba(192,132,252,.1); color:var(--accent); border:1px solid rgba(192,132,252,.25); }
+
+  .pnl-block { margin-left:auto; text-align:right; }
+  .pnl-lbl { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+  .pnl-val { font-family:var(--mono); font-size:26px; font-weight:700; color:var(--muted); }
+  .pnl-val.pos { color:var(--green); }
+  .pnl-val.neg { color:var(--red); }
+
+  .legs-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .leg-card { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .leg-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .leg-name { font-family:var(--mono); font-size:13px; color:var(--accent); letter-spacing:1px; }
+  .leg-phase { font-family:var(--mono); font-size:10px; letter-spacing:1px; padding:4px 10px; border-radius:6px; background:var(--surface); color:var(--muted); text-transform:uppercase; }
+  .leg-phase.open { color:var(--green); border:1px solid rgba(0,230,118,.3); }
+  .leg-phase.wait { color:var(--yellow); border:1px solid rgba(255,193,7,.3); }
+  .leg-phase.closed { color:var(--red); border:1px solid rgba(255,61,87,.3); }
+  .leg-row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; }
+  .leg-row .l { color:var(--muted); }
+  .leg-row .r { font-family:var(--mono); color:var(--text); }
+
+  .log-box { background:#000; border:1px solid var(--border); border-radius:10px; padding:14px; height:180px; overflow-y:auto; font-family:var(--mono); font-size:12px; display:flex; flex-direction:column; gap:4px; }
+  .log-empty { color:var(--muted); }
+  .log-line.def { color:var(--muted); }
+  .log-line.sl { color:var(--red); }
+  .log-line.target { color:var(--green); }
+  .log-line.error { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1 -- LOGIN (its own screen, separate from the main dashboard's) -->
+<div id="screenLogin" class="screen active">
+  <div class="card">
+    <div class="brand">
+      <div class="brand-tag">Sensex Premium Band Algo</div>
+      <div class="brand-title">Welcome Back</div>
+      <div class="brand-sub">Login with your Zerodha account to continue</div>
+    </div>
+    <div class="login-steps">
+      <div class="login-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Click <strong>Login with Zerodha</strong> below</div>
+      </div>
+      <div class="login-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Enter your <strong>Zerodha credentials</strong> on the secure Zerodha page</div>
+      </div>
+      <div class="login-step">
+        <div class="step-num">3</div>
+        <div class="step-text">You'll be <strong>automatically redirected</strong> back here to start the algo</div>
+      </div>
+    </div>
+    <div class="error-msg" id="loginError"></div>
+    <button class="login-btn" onclick="loginWithZerodha()">LOGIN WITH ZERODHA</button>
+    <div class="login-note">Your credentials are entered directly on Zerodha's secure website.<br>We never see your password.</div>
+    <a class="back-link" href="/">&larr; Multi-leg algo dashboard</a>
+  </div>
+</div>
+
+<!-- SCREEN 2 -- DASHBOARD (its own screen, separate from the main dashboard's) -->
+<div id="screenDash" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-brand">SENSEX · PREMIUM BAND</span>
+      <span class="divider-v"></span>
+      <span class="topbar-title">Short Strangle · 60±5 Entry</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span class="user-name-tb" id="userNameTb"></span>
+      <span class="clock" id="clock">--:--:--</span>
+      <a href="/" style="font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted);">MULTI-LEG ALGO</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="dcard">
+      <div class="section-label">Setup — SENSEX</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Expiry (YYYY-MM-DD)</label>
+          <input id="expiry" type="date"/>
+        </div>
+        <div class="form-group">
+          <label>Lots (per leg)</label>
+          <input id="lots" type="number" min="1" value="1"/>
+        </div>
+        <div class="form-group">
+          <label>Target Profit (₹, combined)</label>
+          <input id="targetProfit" type="number" min="1" step="1"/>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-start" id="startBtn" onclick="startAlgo()">Start Algo</button>
+        <button class="btn btn-stop" id="stopBtn" onclick="stopAlgo()" disabled>Stop Algo</button>
+        <button class="btn btn-exit" id="exitBtn" onclick="exitAlgo()" disabled>Exit</button>
+      </div>
+      <div class="error-msg" id="formError"></div>
+    </div>
+
+    <div class="dcard">
+      <div class="status-bar">
+        <div class="status-pill">
+          <div class="pulse-dot" id="statusDot"></div>
+          <span class="status-lbl" id="statusText">IDLE</span>
+        </div>
+        <span class="dry-badge" id="dryBadge">DRY RUN</span>
+        <span class="band-chip">Entry 60±5 · Fallback 60±10 · SL 1.5x</span>
+        <div class="pnl-block">
+          <div class="pnl-lbl">Combined P&amp;L</div>
+          <div class="pnl-val" id="pnlVal">₹0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legs-grid">
+      <div class="leg-card">
+        <div class="leg-head"><span class="leg-name">CE LEG</span><span class="leg-phase" id="CEPhase">--</span></div>
+        <div class="leg-row"><span class="l">Symbol</span><span class="r" id="CESymbol">--</span></div>
+        <div class="leg-row"><span class="l">Entry Premium</span><span class="r" id="CEEntry">--</span></div>
+        <div class="leg-row"><span class="l">Current Premium</span><span class="r" id="CECurrent">--</span></div>
+        <div class="leg-row"><span class="l">Realized P&amp;L</span><span class="r" id="CERealized">--</span></div>
+        <div class="leg-row"><span class="l">Re-entry used</span><span class="r" id="CEReentry">--</span></div>
+      </div>
+      <div class="leg-card">
+        <div class="leg-head"><span class="leg-name">PE LEG</span><span class="leg-phase" id="PEPhase">--</span></div>
+        <div class="leg-row"><span class="l">Symbol</span><span class="r" id="PESymbol">--</span></div>
+        <div class="leg-row"><span class="l">Entry Premium</span><span class="r" id="PEEntry">--</span></div>
+        <div class="leg-row"><span class="l">Current Premium</span><span class="r" id="PECurrent">--</span></div>
+        <div class="leg-row"><span class="l">Realized P&amp;L</span><span class="r" id="PERealized">--</span></div>
+        <div class="leg-row"><span class="l">Re-entry used</span><span class="r" id="PEReentry">--</span></div>
+      </div>
+    </div>
+
+    <div class="dcard" style="margin-top:16px;">
+      <div class="section-label">Log</div>
+      <div class="log-box" id="logBox"><span class="log-empty">No logs yet...</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const RUNNING_STATES = ["waiting_for_market", "searching", "monitoring"];
+  let pollTimer = null;
+  let logLines = [];
+  let lastStatus = null;
+  let lastExitReason = null;
+  let lastError = null;
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function pushLog(line, cls) {
+    const t = new Date().toLocaleTimeString("en-IN", {hour12:false});
+    logLines.push({t, line, cls});
+    if (logLines.length > 200) logLines.shift();
+    renderLog();
+  }
+  function renderLog() {
+    const box = document.getElementById("logBox");
+    if (!logLines.length) { box.innerHTML = '<span class="log-empty">No logs yet...</span>'; return; }
+    box.innerHTML = logLines.map(l => `<span class="log-line ${l.cls}">[${l.t}] ${l.line}</span>`).join("\n");
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function tickClock() {
+    document.getElementById("clock").textContent = new Date().toLocaleTimeString("en-IN", {hour12:false});
+  }
+  setInterval(tickClock, 1000); tickClock();
+
+  async function loginWithZerodha() {
+    const errEl = document.getElementById("loginError");
+    errEl.textContent = "";
+    try {
+      const res = await fetch("/api/zerodha-login-url?next=/premium");
+      const data = await res.json();
+      window.location.href = data.url;
+    } catch (e) {
+      errEl.textContent = "Could not reach the server. Try again.";
+    }
+  }
+
+  async function init() {
+    try {
+      const res = await fetch("/api/auth-status");
+      const data = await res.json();
+      if (data.logged_in) {
+        document.getElementById("userNameTb").textContent = data.user_name ? `${data.user_name} ✓` : "Connected ✓";
+        showScreen("screenDash");
+        startPolling();
+      } else {
+        showScreen("screenLogin");
+      }
+    } catch (e) {
+      showScreen("screenLogin");
+    }
+  }
+
+  async function startAlgo() {
+    const errEl = document.getElementById("formError");
+    errEl.textContent = "";
+    const body = {
+      expiry: document.getElementById("expiry").value,
+      lots: parseInt(document.getElementById("lots").value, 10),
+      target_profit: parseFloat(document.getElementById("targetProfit").value),
+    };
+    if (!body.expiry) { errEl.textContent = "Expiry is required."; return; }
+    if (!body.lots || body.lots <= 0) { errEl.textContent = "Lots must be a positive number."; return; }
+    if (!body.target_profit || body.target_profit <= 0) { errEl.textContent = "Target profit must be positive."; return; }
+
+    document.getElementById("startBtn").disabled = true;
+    try {
+      const res = await fetch("/api/premium/start", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail || "Failed to start."; document.getElementById("startBtn").disabled = false; return; }
+      pushLog("Algo started.", "def");
+      startPolling();
+    } catch (e) {
+      errEl.textContent = "Network error starting algo.";
+      document.getElementById("startBtn").disabled = false;
+    }
+  }
+
+  async function stopAlgo() {
+    document.getElementById("stopBtn").disabled = true;
+    try { await fetch("/api/premium/stop", {method:"POST"}); pushLog("Stop requested.", "def"); }
+    catch (e) { pushLog("Failed to request stop.", "error"); }
+  }
+
+  async function exitAlgo() {
+    document.getElementById("exitBtn").disabled = true;
+    try { await fetch("/api/premium/exit", {method:"POST"}); pushLog("Exit requested.", "def"); }
+    catch (e) { pushLog("Failed to request exit.", "error"); }
+  }
+
+  function startPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollStatus();
+    pollTimer = setInterval(pollStatus, 3000);
+  }
+
+  async function pollStatus() {
+    try {
+      const res = await fetch("/api/premium/status");
+      const data = await res.json();
+      render(data);
+    } catch (e) { /* ignore transient errors */ }
+  }
+
+  function render(data) {
+    const dot = document.getElementById("statusDot");
+    const lbl = document.getElementById("statusText");
+    const running = RUNNING_STATES.includes(data.status);
+
+    if (data.status !== lastStatus) {
+      pushLog(`Status -> ${(data.status || "idle").toUpperCase()}`, "def");
+      lastStatus = data.status;
+    }
+    if (data.exit_reason && data.exit_reason !== lastExitReason) {
+      const pnlTxt = "₹" + Number(data.total_pnl || 0).toLocaleString("en-IN", {minimumFractionDigits: 2});
+      let cls = data.exit_reason.includes("TARGET") ? "target" : (data.exit_reason.includes("STOP") ? "sl" : "def");
+      pushLog(`EXIT -- ${data.exit_reason} | P&L ${pnlTxt}`, cls);
+      lastExitReason = data.exit_reason;
+    }
+    if (data.error_message && data.error_message !== lastError) {
+      pushLog(`[ERROR] ${data.error_message}`, "error");
+      lastError = data.error_message;
+    }
+
+    dot.classList.toggle("on", running);
+    lbl.classList.toggle("on", running);
+    lbl.textContent = (data.status || "idle").toUpperCase();
+
+    document.getElementById("dryBadge").classList.toggle("on", !!data.dry_run);
+
+    document.getElementById("startBtn").disabled = running;
+    document.getElementById("stopBtn").disabled = !running;
+    document.getElementById("exitBtn").disabled = !running;
+
+    const pnl = data.total_pnl || 0;
+    const pnlEl = document.getElementById("pnlVal");
+    pnlEl.textContent = "₹" + pnl.toLocaleString("en-IN", {minimumFractionDigits: 2});
+    pnlEl.className = "pnl-val" + (pnl > 0 ? " pos" : pnl < 0 ? " neg" : "");
+
+    ["CE", "PE"].forEach(leg => {
+      const s = data.legs && data.legs[leg];
+      const phaseEl = document.getElementById(leg + "Phase");
+      if (!s) { phaseEl.textContent = "--"; return; }
+      phaseEl.textContent = s.phase.replace(/_/g, " ").toUpperCase();
+      phaseEl.className = "leg-phase " + (s.phase === "in_position" ? "open" : s.phase === "reentry_wait" ? "wait" : (s.phase.startsWith("closed") ? "closed" : ""));
+
+      document.getElementById(leg + "Symbol").textContent = s.symbol || "--";
+      document.getElementById(leg + "Entry").textContent = s.entry_premium != null ? "₹" + s.entry_premium : "--";
+      document.getElementById(leg + "Current").textContent = s.current_premium != null ? "₹" + s.current_premium : "--";
+      document.getElementById(leg + "Realized").textContent = "₹" + Number(s.realized_pnl || 0).toFixed(2);
+      document.getElementById(leg + "Reentry").textContent = s.reentry_used ? "Yes" : "No";
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
