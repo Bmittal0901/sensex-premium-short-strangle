@@ -280,7 +280,7 @@
         <div class="leg-row"><span class="l">Symbol</span><span class="r" id="CESymbol">--</span></div>
         <div class="leg-row"><span class="l">Entry Premium</span><span class="r" id="CEEntry">--</span></div>
         <div class="leg-row"><span class="l">Current Premium</span><span class="r" id="CECurrent">--</span></div>
-        <div class="leg-row"><span class="l">Realized P&amp;L</span><span class="r" id="CERealized">--</span></div>
+        <div class="leg-row"><span class="l">Individual P&amp;L</span><span class="r" id="CERealized">--</span></div>
         <div class="leg-row"><span class="l">Re-entry used</span><span class="r" id="CEReentry">--</span></div>
       </div>
       <div class="leg-card">
@@ -288,7 +288,7 @@
         <div class="leg-row"><span class="l">Symbol</span><span class="r" id="PESymbol">--</span></div>
         <div class="leg-row"><span class="l">Entry Premium</span><span class="r" id="PEEntry">--</span></div>
         <div class="leg-row"><span class="l">Current Premium</span><span class="r" id="PECurrent">--</span></div>
-        <div class="leg-row"><span class="l">Realized P&amp;L</span><span class="r" id="PERealized">--</span></div>
+        <div class="leg-row"><span class="l">Individual P&amp;L</span><span class="r" id="PERealized">--</span></div>
         <div class="leg-row"><span class="l">Re-entry used</span><span class="r" id="PEReentry">--</span></div>
       </div>
     </div>
@@ -369,7 +369,7 @@
       target_profit: targetInput === ""? null : parseFloat(targetInput),
       dry_run: document.getElementById("dryRun").checked,
     };
-    
+
     if (!body.expiry) { errEl.textContent = "Expiry is required."; return; }
     if (!body.lots || body.lots <= 0) { errEl.textContent = "Lots must be a positive number."; return; }
 
@@ -571,7 +571,7 @@
       document.getElementById(leg + "Symbol").textContent = s.symbol || "--";
       document.getElementById(leg + "Entry").textContent = s.entry_premium != null ? "₹" + s.entry_premium : "--";
       document.getElementById(leg + "Current").textContent = s.current_premium != null ? "₹" + s.current_premium : "--";
-      document.getElementById(leg + "Realized").textContent = "₹" + Number(s.realized_pnl || 0).toFixed(2);
+      document.getElementById(leg + "Realized").textContent = "₹" + Number(s.display_pnl || 0).toFixed(2);
       document.getElementById(leg + "Reentry").textContent = s.reentry_used ? "Yes" : "No";
     });
   }

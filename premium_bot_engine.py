@@ -116,6 +116,7 @@ class PremiumSellBot:
             "current_premium": None,
             "qty": 0,
             "realized_pnl": 0.0,
+            "display_pnl": 0.0,
             "reentry_used": False,
             "sl_count": 0,
             "entry_time": None,
@@ -390,6 +391,7 @@ class PremiumSellBot:
 
         pnl = sell_leg_pnl(state["entry_premium"], exit_price, qty)
         state["realized_pnl"] += pnl
+        state["display_pnl"] = state["realized_pnl"]
         state["current_premium"] = exit_price
         print(f"[{leg}] EXITED {symbol} ({reason_label}) pnl={pnl:.2f}")
 
@@ -408,6 +410,24 @@ class PremiumSellBot:
 
     def _combined_pnl(self):
         return combined_pnl(self.legs)
+    
+    def _leg_total_pnl(self, leg):
+        state = self.legs[leg]
+
+        pnl = state["realized_pnl"]
+
+        if (
+            state["phase"] == "in_position"
+            and state["entry_premium"] is not None
+            and state["current_premium"] is not None
+        ):
+            pnl += sell_leg_pnl(
+                state["entry_premium"],
+                state["current_premium"],
+                state["qty"]
+            )
+
+        return pnl
 
     def _open_legs(self):
         return [leg for leg, s in self.legs.items() if s["phase"] == "in_position"]
@@ -439,6 +459,8 @@ class PremiumSellBot:
                     for leg in self._open_legs():
                         self._close_leg(leg, phase_on_close="closed_manual", reason_label="MANUAL EXIT")
                     self.total_pnl = self._combined_pnl()
+                    for leg in ("CE", "PE"):
+                        self.legs[leg]["display_pnl"] = self._leg_total_pnl(leg)
                     self._set(status="exited", exit_reason="MANUAL EXIT",
                               total_pnl=self.total_pnl, ended_at=datetime.now(IST).isoformat())
                     return
@@ -453,6 +475,8 @@ class PremiumSellBot:
                 for leg in self._open_legs():
                     self._close_leg(leg, phase_on_close="closed_eod", reason_label="EOD SQUARE-OFF")
                 self.total_pnl = self._combined_pnl()
+                for leg in ("CE", "PE"):
+                    self.legs[leg]["display_pnl"] = self._leg_total_pnl(leg)
                 self._set(status="exited", exit_reason="EOD SQUARE-OFF",
                           total_pnl=self.total_pnl, ended_at=datetime.now(IST).isoformat())
                 return
@@ -463,6 +487,9 @@ class PremiumSellBot:
                     self._try_enter_or_reenter(leg)
                 elif phase == "in_position":
                     self._monitor_open_leg(leg)
+            
+            for leg in ("CE", "PE"):
+                self.legs[leg]["display_pnl"] = self._leg_total_pnl(leg)
 
             self.total_pnl = self._combined_pnl()
             self._set(total_pnl=self.total_pnl, legs={k: dict(v) for k, v in self.legs.items()})
@@ -471,11 +498,17 @@ class PremiumSellBot:
                 for leg in self._open_legs():
                     self._close_leg(leg, phase_on_close="closed_target", reason_label="TARGET PROFIT")
                 self.total_pnl = self._combined_pnl()
+                for leg in ("CE", "PE"):
+                    self.legs[leg]["display_pnl"] = self._leg_total_pnl(leg)
                 self._set(status="exited", exit_reason="TARGET PROFIT HIT",
                           total_pnl=self.total_pnl, ended_at=datetime.now(IST).isoformat())
                 return
 
             if not self._active_legs():
+                self.total_pnl = self._combined_pnl()
+
+                for leg in ("CE", "PE"):
+                    self.legs[leg]["display_pnl"] = self._leg_total_pnl(leg)
                 self._set(status="exited", exit_reason="BOTH LEGS PERMANENTLY STOPPED OUT",
                           total_pnl=self.total_pnl, ended_at=datetime.now(IST).isoformat())
                 return
