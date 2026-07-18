@@ -208,6 +208,12 @@
     </div>
     <div style="display:flex;align-items:center;gap:14px;">
       <span class="user-name-tb" id="userNameTb"></span>
+      <button
+            id="logoutBtn"
+            class="btn btn-outline"
+            onclick="logout()">
+            LOGOUT
+      </button>
       <span class="clock" id="clock">--:--:--</span>
       <a href="/" style="font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted);">MULTI-LEG ALGO</a>
     </div>
@@ -442,6 +448,51 @@
         label.style.color="#ff5555";
     }
 
+    async function logout() {
+
+        const ok = confirm(
+            "Logout from Zerodha and return to the login screen?"
+        );
+
+        if (!ok) return;
+
+        stopPolling();
+
+        try {
+
+            await fetch("/api/logout", {
+                method: "POST"
+            });
+
+        } catch (e) {}
+
+        // Clear setup form
+        document.getElementById("expiry").value = "";
+        document.getElementById("lots").value = 1;
+        document.getElementById("targetProfit").value = "";
+        document.getElementById("dryRun").checked = true;
+
+        // Reset UI
+        resetDashboard();
+
+        showScreen("screenLogin");
+    }
+
+    function resetDashboard() {
+
+        document.getElementById("statusText").textContent = "IDLE";
+
+        document.getElementById("combinedPnl").textContent = "₹0.00";
+
+        // CE
+        updateLegUI("ce", null);
+
+        // PE
+        updateLegUI("pe", null);
+
+        document.getElementById("log").innerHTML = "";
+
+    }
   function render(data) {
     const dot = document.getElementById("statusDot");
     const lbl = document.getElementById("statusText");
