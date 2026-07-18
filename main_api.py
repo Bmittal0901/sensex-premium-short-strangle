@@ -277,6 +277,7 @@ class StartRequest(BaseModel):
     expiry: str
     lots: int = Field(gt=0)
     target_profit: float = Field(gt=0)
+    dry_run: bool = True
 
 
 @app.post("/api/start")
@@ -291,7 +292,7 @@ def start(req: StartRequest):
         "expiry": req.expiry,
         "lots": req.lots,
         "target_profit": req.target_profit,
-        "dry_run": env_dry_run(),
+        "dry_run": req.dry_run,
     }
 
     _premium_bot = PremiumSellBot(kite, config)

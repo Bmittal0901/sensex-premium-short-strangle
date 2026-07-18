@@ -172,6 +172,17 @@
           <label>Target Profit (₹, combined)</label>
           <input id="targetProfit" type="number" min="1" step="1"/>
         </div>
+        <div class="form-group">
+            <label>Mode</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                <input
+                    id="dryRun"
+                    type="checkbox"
+                    checked
+                >
+                Dry Run
+            </label>
+        </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-start" id="startBtn" onclick="startAlgo()">Start Algo</button>
@@ -288,6 +299,8 @@
       expiry: document.getElementById("expiry").value,
       lots: parseInt(document.getElementById("lots").value, 10),
       target_profit: parseFloat(document.getElementById("targetProfit").value),
+      dry_run: document.getElementById("dryRun").checked,
+
     };
     if (!body.expiry) { errEl.textContent = "Expiry is required."; return; }
     if (!body.lots || body.lots <= 0) { errEl.textContent = "Lots must be a positive number."; return; }
