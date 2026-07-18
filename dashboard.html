@@ -54,7 +54,64 @@
   .topbar-title { font-size:13px; color:var(--muted); }
   .clock { font-family:var(--mono); font-size:13px; color:var(--muted); }
   .user-name-tb { font-size:12px; color:var(--green); font-family:var(--mono); }
+  .mode-toggle{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:10px;}
 
+    .mode-toggle span{
+        font-size:13px;
+        font-weight:600;
+        letter-spacing:1px;
+        color:#b983ff;
+    }
+
+    .switch{
+        position:relative;
+        display:inline-block;
+        width:56px;
+        height:30px;
+    }
+
+    .switch input{
+        opacity:0;
+        width:0;
+        height:0;
+    }
+
+    .slider{
+        position:absolute;
+        inset:0;
+        background:#34304d;
+        border-radius:999px;
+        cursor:pointer;
+        transition:.25s;
+    }
+
+    .slider:before{
+        content:"";
+        position:absolute;
+        width:22px;
+        height:22px;
+        left:4px;
+        top:4px;
+        background:white;
+        border-radius:50%;
+        transition:.25s;
+    }
+
+    input:checked + .slider{
+        background:#8b5cf6;
+    }
+
+    input:not(:checked) + .slider{
+        background:#ff4444;
+    }
+
+    input:checked + .slider:before{
+        transform:translateX(26px);
+    }
   .wrap { max-width:1000px; margin:0 auto; padding:24px; width:100%; }
   .dcard { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:16px; }
   .section-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
@@ -174,14 +231,19 @@
         </div>
         <div class="form-group">
             <label>Mode</label>
-            <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-                <input
-                    id="dryRun"
-                    type="checkbox"
-                    checked
-                >
-                Dry Run
-            </label>
+
+            <div class="mode-toggle">
+                <span id="modeLabel">DRY RUN</span>
+
+                <label class="switch">
+                    <input
+                        id="dryRun"
+                        type="checkbox"
+                        checked
+                        onchange="handleModeToggle(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
       </div>
       <div class="btn-row">
@@ -199,7 +261,6 @@
           <span class="status-lbl" id="statusText">IDLE</span>
         </div>
         <span class="dry-badge" id="dryBadge">DRY RUN</span>
-        <span class="band-chip">Entry 60±5 · Fallback 60±10 · SL 1.5x</span>
         <div class="pnl-block">
           <div class="pnl-lbl">Combined P&amp;L</div>
           <div class="pnl-val" id="pnlVal">₹0.00</div>
@@ -348,6 +409,38 @@
       render(data);
     } catch (e) { /* ignore transient errors */ }
   }
+
+  function handleModeToggle(toggle){
+
+    const label = document.getElementById("modeLabel");
+
+    if(toggle.checked){
+
+        label.innerHTML = "DRY RUN";
+        label.style.color="#b983ff";
+        return;
+    }
+
+    const ok = confirm(
+    `⚠️ LIVE MODE
+
+    Real orders will be placed in your Zerodha account.
+
+    • Orders cannot be automatically reversed.
+    • Real money is at risk.
+
+    Do you want to continue?`
+        );
+
+        if(!ok){
+
+            toggle.checked = true;
+            return;
+        }
+
+        label.innerHTML="LIVE";
+        label.style.color="#ff5555";
+    }
 
   function render(data) {
     const dot = document.getElementById("statusDot");
