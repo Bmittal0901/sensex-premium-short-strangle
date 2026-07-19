@@ -6,8 +6,8 @@ Avoid hardcoding values anywhere else in the project.
 """
 INDEX = "SENSEX"
 LOT_SIZE = 20
-ENTRY_TIME = "09:50"
-EXIT_TIME = "15:20"
+ENTRY_TIME = "09:15"
+EXIT_TIME = "15:25"
 TARGET_PREMIUM = 60
 PREMIUM_MIN = 55
 PREMIUM_MAX = 65
