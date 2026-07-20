@@ -1,6 +1,4 @@
 """
-Global configuration for Premium Short Straddle.
-
 All strategy constants should be defined here.
 Avoid hardcoding values anywhere else in the project.
 """
@@ -11,7 +9,7 @@ EXIT_TIME = "15:25"
 TARGET_PREMIUM = 60
 PREMIUM_MIN = 55
 PREMIUM_MAX = 65
-STOPLOSS_PERCENT = 5
+STOPLOSS_PERCENT = 50
 
 MAX_REENTRY = 1
 
