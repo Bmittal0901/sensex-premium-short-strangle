@@ -632,7 +632,7 @@
       document.getElementById(leg + "Current").textContent = s.current_premium != null ? "₹" + s.current_premium : "--";
       document.getElementById(leg + "Realized").textContent = "₹" + Number(s.display_pnl || 0).toFixed(2);
       document.getElementById(leg + "Reentry").textContent = s.reentry_used
-          ? `✓ Used (${s.reentry_count}/1)`
+          ? `✓ Used (${s.sl_count}/1)`
           : "Not Used";
         });
   }
