@@ -180,7 +180,9 @@
       }
 
       .btn-row{
-          flex-direction:column;
+        display:flex;
+        flex-direction:column;
+        gap:16px;
       }
 
       .btn{
@@ -608,18 +610,9 @@
     const startBtn = document.getElementById("startBtn");
     const stopBtn = document.getElementById("stopBtn");
     const exitBtn = document.getElementById("exitBtn");
-
-    if (running){
-
-        startBtn.style.display = "none";
-        stopBtn.style.display = "block";
-
-    }else{
-
-        startBtn.style.display = "block";
-        stopBtn.style.display = "none";
-
-    }
+    startBtn.disabled = running;
+    stopBtn.disabled = !running;
+    exitBtn.disabled = !running;
 
     exitBtn.disabled = !running;
     toggle.disabled = running;
