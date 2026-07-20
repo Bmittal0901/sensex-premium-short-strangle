@@ -165,6 +165,41 @@
   .log-line.sl { color:var(--red); }
   .log-line.target { color:var(--green); }
   .log-line.error { color:var(--red); font-weight:700; }
+  @media (max-width:768px){
+
+      .wrap{
+          padding:12px;
+      }
+
+      .form-grid{
+          grid-template-columns:1fr;
+      }
+
+      .legs-grid{
+          grid-template-columns:1fr;
+      }
+
+      .btn-row{
+          flex-direction:column;
+      }
+
+      .btn{
+          width:100%;
+      }
+
+      .topbar{
+          padding:12px;
+      }
+
+      .dcard{
+          padding:16px;
+      }
+
+      .pnl-val{
+          font-size:40px;
+      }
+
+  }
 </style>
 </head>
 <body>
@@ -253,9 +288,27 @@
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-start" id="startBtn" onclick="startAlgo()">Start Algo</button>
-        <button class="btn btn-stop" id="stopBtn" onclick="stopAlgo()" disabled>Stop Algo</button>
-        <button class="btn btn-exit" id="exitBtn" onclick="exitAlgo()" disabled>Exit</button>
+          <button
+              class="btn btn-start"
+              id="startBtn"
+              onclick="startAlgo()">
+              ▶ START ALGO
+          </button>
+
+          <button
+              class="btn btn-stop"
+              id="stopBtn"
+              onclick="stopAlgo()"
+              style="display:none;">
+              ■ STOP ALGO
+          </button>
+
+          <button
+              class="btn btn-exit"
+              id="exitBtn"
+              onclick="exitAlgo()">
+              EXIT
+          </button>
       </div>
       <div class="error-msg" id="formError"></div>
     </div>
@@ -552,9 +605,23 @@
           modeLabel.style.color = "#ff5555";
       }
     }
-    document.getElementById("startBtn").disabled = running;
-    document.getElementById("stopBtn").disabled = !running;
-    document.getElementById("exitBtn").disabled = !running;
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const exitBtn = document.getElementById("exitBtn");
+
+    if (running){
+
+        startBtn.style.display = "none";
+        stopBtn.style.display = "block";
+
+    }else{
+
+        startBtn.style.display = "block";
+        stopBtn.style.display = "none";
+
+    }
+
+    exitBtn.disabled = !running;
     toggle.disabled = running;
     const pnl = data.total_pnl || 0;
     const pnlEl = document.getElementById("pnlVal");
@@ -572,8 +639,10 @@
       document.getElementById(leg + "Entry").textContent = s.entry_premium != null ? "₹" + s.entry_premium : "--";
       document.getElementById(leg + "Current").textContent = s.current_premium != null ? "₹" + s.current_premium : "--";
       document.getElementById(leg + "Realized").textContent = "₹" + Number(s.display_pnl || 0).toFixed(2);
-      document.getElementById(leg + "Reentry").textContent = s.reentry_used ? "Yes" : "No";
-    });
+      document.getElementById(leg + "Reentry").textContent = s.reentry_used
+          ? `✓ Used (${s.reentry_count}/1)`
+          : "Not Used";
+        });
   }
 
   init();
