@@ -127,16 +127,15 @@
   }
   .form-group { display:flex; flex-direction:column; gap:7px; }
   .form-group label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; font-weight:500; }
-  .form-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:11px 14px; font-size:14px; font-family:var(--sans); outline:none; width:100%; }
+  .form-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:10px 12px; height:46px;font-size:14px; font-family:var(--sans); outline:none; width:100%; }
   .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(192,132,252,0.12); }
-
-  .btn-row { display:flex; gap:12px; margin-top:6px; }
+  .btn-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
   .btn { padding:14px 20px; border-radius:10px; font-family:var(--mono); font-size:12px; letter-spacing:1.5px; cursor:pointer; text-transform:uppercase; border:none; }
   .btn:active { transform:scale(0.98); }
   .btn:disabled { opacity:0.35; cursor:not-allowed; }
-  .btn-start { background:var(--accent); color:#12081f; font-weight:700; flex:1; }
-  .btn-stop { background:transparent; border:1px solid var(--red); color:var(--red); }
-  .btn-exit { background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
+  .btn-start { background:var(--accent); color:#12081f; font-weight:700;  grid-column:1 / -1;}
+  .btn-stop { background:transparent; border:1px solid var(--red); color:var(--red); width:100%; }
+  .btn-exit { background:transparent; border:1px solid var(--yellow); color:var(--yellow); width:100%; }
 
   .status-bar { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
   .status-pill { display:flex; align-items:center; gap:10px; }
@@ -194,9 +193,18 @@
 
       .btn-row{
         display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:14px;
-      }
+        grid-template-columns:repeat(2, 1fr);
+        gap:12px;
+    }
+
+    .btn-start{
+        grid-column:1 / -1;
+    }
+
+    .btn-stop,
+    .btn-exit{
+        width:100%;
+    }
 
       .btn{
           width:100%;
@@ -273,17 +281,17 @@
     <div class="dcard">
       <div class="section-label">Setup — SENSEX</div>
       <div class="form-grid">
-        <div class="half">
+        <div class="form-group half">
         <label>Expiry</label>
         <input id="expiry">
         </div>
-        <div class="half">
+        <div class="form-group half">
         <label>Lots</label>
         <input
             id="lots"
             type="number">
         </div>
-        <div class="full">
+        <div class="form-group full">
         <label>Target Profit (₹)</label>
         <input
             id="targetProfit"
