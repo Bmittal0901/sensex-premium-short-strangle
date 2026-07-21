@@ -127,7 +127,12 @@
   }
   .form-group { display:flex; flex-direction:column; gap:7px; }
   .form-group label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; font-weight:500; }
-  .form-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:10px 12px; height:46px;font-size:14px; font-family:var(--sans); outline:none; width:100%; }
+  .form-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:0px 14px; height:50px;font-size:15px; font-family:var(--sans); outline:none; width:100%; appearance:none; -webkit-appearance:none;box-sizing:border-box;}
+  input[type="date"],
+  input[type="number"]
+  { height:50px;min-height:50px;padding:0 14px;line-height:50px;box-sizing:border-box;}
+ input[type="date"]::-webkit-date-and-time-value{text-align:center;}
+  input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.9; cursor:pointer;} 
   .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(192,132,252,0.12); }
   .btn-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
   .btn { padding:14px 20px; border-radius:10px; font-family:var(--mono); font-size:12px; letter-spacing:1.5px; cursor:pointer; text-transform:uppercase; border:none; }
