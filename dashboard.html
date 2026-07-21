@@ -116,7 +116,15 @@
   .dcard { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:16px; }
   .section-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
 
-  .form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+  .form-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:14px;
+    align-items:end;
+  }
+  .full{
+    grid-column:1 / span 2;
+  }
   .form-group { display:flex; flex-direction:column; gap:7px; }
   .form-group label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; font-weight:500; }
   .form-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:11px 14px; font-size:14px; font-family:var(--sans); outline:none; width:100%; }
@@ -172,7 +180,12 @@
       }
 
       .form-grid{
-          grid-template-columns:1fr;
+        grid-template-columns:2fr 1fr;
+        gap:10px;
+      }
+
+      .form-grid .full{
+        grid-column:1 / span 2;
       }
 
       .legs-grid{
@@ -180,9 +193,9 @@
       }
 
       .btn-row{
-        display:flex;
-        flex-direction:column;
-        gap:16px;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:14px;
       }
 
       .btn{
@@ -260,18 +273,23 @@
     <div class="dcard">
       <div class="section-label">Setup — SENSEX</div>
       <div class="form-grid">
-        <div class="form-group">
-          <label>Expiry (YYYY-MM-DD)</label>
-          <input id="expiry" type="date"/>
+        <div class="half">
+        <label>Expiry</label>
+        <input id="expiry">
         </div>
-        <div class="form-group">
-          <label>Lots (per leg)</label>
-          <input id="lots" type="number" min="1" value="1"/>
+        <div class="half">
+        <label>Lots</label>
+        <input
+            id="lots"
+            type="number">
         </div>
-        <div class="form-group">
-          <label>Target Profit (₹, combined)</label>
-          <input id="targetProfit" type="number" min="1" step="1"/>
+        <div class="full">
+        <label>Target Profit (₹)</label>
+        <input
+            id="targetProfit"
+            type="number">
         </div>
+      </div>
         <div class="form-group">
             <label>Mode</label>
 
