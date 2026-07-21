@@ -283,19 +283,23 @@
       <div class="form-grid">
         <div class="form-group half">
         <label>Expiry</label>
-        <input id="expiry">
+        <input id="expiry" type="date">
         </div>
         <div class="form-group half">
         <label>Lots</label>
         <input
             id="lots"
-            type="number">
+            type="number"
+            min="1"
+            value="1">
         </div>
         <div class="form-group full">
         <label>Target Profit (₹)</label>
         <input
             id="targetProfit"
-            type="number">
+            type="number"
+            min="0"
+            step="1">
         </div>
       </div>
         <div class="form-group">
